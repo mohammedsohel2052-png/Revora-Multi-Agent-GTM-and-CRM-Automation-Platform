@@ -259,7 +259,60 @@ Or add permanently via System Properties → Environment Variables.
 - `packages/shared/src/index.ts`, `packages/shared/src/events/domain-events.ts`, `packages/shared/tsconfig.json`
 - `packages/db/package.json`, `packages/db/tsconfig.json`, `packages/db/drizzle.config.ts`, `packages/db/src/schema/index.ts`, `packages/db/src/client.ts`, `packages/db/src/index.ts`
 - `apps/api/package.json`, `apps/api/tsconfig.json`, `apps/api/src/main.ts`, `apps/api/src/app.module.ts`, `apps/api/src/common/**`, `apps/api/src/modules/**`
-- `apps/web/package.json`, `apps/web/tsconfig.json`, `apps/web/next.config.mjs`, `apps/web/app/globals.css`, `apps/web/app/layout.tsx`, `apps/web/app/page.tsx`, `apps/web/app/(dashboard)/**`
+---
+
+## 2026-09-24 — Phase 2: Agent Runtime & Safety Engine
+
+### [2026-09-24] — Agent Swarm Orchestrator & Tool Safety Harness Built and Tested
+**Who:** Antigravity AI  
+**Phase:** Phase 2 (Agent Runtime)  
+**Type:** Feature | Security | Test
+
+**What happened:**
+1. **Tool Execution & Safety Harness (`apps/api/src/tools/`):**
+   - Built [`AgentTool`](file:///c:/PROJECTS/Revora%20%E2%80%94%20Multi-Agent%20GTM%20and%20CRM%20Automation%20Platform/apps/api/src/tools/tool.interface.ts) and [`ToolExecutionContext`](file:///c:/PROJECTS/Revora%20%E2%80%94%20Multi-Agent%20GTM%20and%20CRM%20Automation%20Platform/apps/api/src/tools/tool.interface.ts) contracts with Zod input schema validation, risk tiers (`read`, `write`, `external_read`, `external_write`, `financial`), and policy hooks.
+   - Built [`ToolRegistryService`](file:///c:/PROJECTS/Revora%20%E2%80%94%20Multi-Agent%20GTM%20and%20CRM%20Automation%20Platform/apps/api/src/tools/tool-registry.service.ts) wrapping every tool call with input schema validation, approval checks, latency measurement, and automated PII-redacted audit recording.
+   - Implemented core safe tools:
+     - [`search_crm_contacts`](file:///c:/PROJECTS/Revora%20%E2%80%94%20Multi-Agent%20GTM%20and%20CRM%20Automation%20Platform/apps/api/src/tools/definitions/search-crm-contacts.tool.ts) (read contact & company directory)
+     - [`update_lead_qualification`](file:///c:/PROJECTS/Revora%20%E2%80%94%20Multi-Agent%20GTM%20and%20CRM%20Automation%20Platform/apps/api/src/tools/definitions/update-qualification.tool.ts) (persists score, intent, reasons, and next action to lead)
+     - [`request_human_approval`](file:///c:/PROJECTS/Revora%20%E2%80%94%20Multi-Agent%20GTM%20and%20CRM%20Automation%20Platform/apps/api/src/tools/definitions/create-approval-request.tool.ts) (pauses action, writes proposal to `approval_requests` with expiration)
+     - [`draft_outbound_message`](file:///c:/PROJECTS/Revora%20%E2%80%94%20Multi-Agent%20GTM%20and%20CRM%20Automation%20Platform/apps/api/src/tools/definitions/draft-outbound-message.tool.ts) (drafts reply; automatically intercepts and escalates to HITL if pricing is quoted or autonomous sending is disabled)
+     - [`check_calendar_availability`](file:///c:/PROJECTS/Revora%20%E2%80%94%20Multi-Agent%20GTM%20and%20CRM%20Automation%20Platform/apps/api/src/tools/definitions/check-calendar.tool.ts) (retrieves open sales walkthrough slots)
+
+2. **Specialized Swarm Agents (`apps/api/src/agents/`):**
+   - Built abstract [`BaseAgent`](file:///c:/PROJECTS/Revora%20%E2%80%94%20Multi-Agent%20GTM%20and%20CRM%20Automation%20Platform/apps/api/src/agents/base.agent.ts) with strict `allowedTools` permissions enforcement and execution context.
+   - **Lead Intake Agent ([`lead-intake.agent.ts`](file:///c:/PROJECTS/Revora%20%E2%80%94%20Multi-Agent%20GTM%20and%20CRM%20Automation%20Platform/apps/api/src/agents/lead-intake/lead-intake.agent.ts)):** Normalizes raw payload across Instagram, Email, WhatsApp, Form, and Web; resolves or creates Contact; creates Lead with status 'new'; creates initial Conversation thread.
+   - **Qualification Agent ([`qualification.agent.ts`](file:///c:/PROJECTS/Revora%20%E2%80%94%20Multi-Agent%20GTM%20and%20CRM%20Automation%20Platform/apps/api/src/agents/qualification/qualification.agent.ts)):** Implements deterministic explainable ICP fit scoring and intent scoring based on executive roles, company headcount, industry, and buying signals. Emits structured reasons and missing information.
+   - **Conversation Agent ([`conversation.agent.ts`](file:///c:/PROJECTS/Revora%20%E2%80%94%20Multi-Agent%20GTM%20and%20CRM%20Automation%20Platform/apps/api/src/agents/conversation/conversation.agent.ts)):** Handles multi-turn conversational replies with calendar slot negotiation and strict pricing approval guardrails.
+   - **Supervisor Agent ([`supervisor.agent.ts`](file:///c:/PROJECTS/Revora%20%E2%80%94%20Multi-Agent%20GTM%20and%20CRM%20Automation%20Platform/apps/api/src/agents/supervisor.agent.ts)):** Orchestrates multi-agent swarm state machine: `Intake ➡️ Qualification ➡️ Conversation / Booking ➡️ Human Review (if gated)`. Emits token/cost tracking to `usage_events`.
+
+3. **REST API & Endpoints (`apps/api/src/modules/agents/`):**
+   - `GET /api/v1/agents` — Lists tenant's active agent swarm
+   - `GET /api/v1/agents/tools` — Lists all registered safe tools and risk classifications
+   - `POST /api/v1/agents/pipeline/run` — Executes end-to-end swarm pipeline on raw inbound lead
+   - `POST /api/v1/agents/qualification/score` — Dedicated explainable ICP scoring endpoint
+   - `POST /api/v1/agents/conversation/reply` — Tests agent conversational turn with safety guardrails
+
+4. **Automated Testing Suite (`apps/api/test/agent-runtime.spec.ts`):**
+   - Created 6 unit tests covering schema validation, audit emission, explainable ICP scoring, and pricing approval triggers.
+   - All 6 tests passing!
+
+**Files affected:**
+- `apps/api/src/tools/tool.interface.ts`
+- `apps/api/src/tools/tool-registry.service.ts`
+- `apps/api/src/tools/tools.module.ts`
+- `apps/api/src/tools/definitions/*.ts`
+- `apps/api/src/agents/base.agent.ts`
+- `apps/api/src/agents/lead-intake/lead-intake.agent.ts`
+- `apps/api/src/agents/qualification/qualification.agent.ts`
+- `apps/api/src/agents/conversation/conversation.agent.ts`
+- `apps/api/src/agents/supervisor.agent.ts`
+- `apps/api/src/modules/agents/agents.service.ts`
+- `apps/api/src/modules/agents/agents.controller.ts`
+- `apps/api/src/modules/agents/agents.module.ts`
+- `apps/api/src/app.module.ts`
+- `apps/api/package.json`
+- `apps/api/test/agent-runtime.spec.ts`
 
 ---
 

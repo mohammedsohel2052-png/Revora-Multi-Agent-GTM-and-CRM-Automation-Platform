@@ -6,6 +6,8 @@ import { AuditInterceptor } from './common/interceptors/audit.interceptor';
 import { AuditModule } from './modules/audit/audit.module';
 import { HealthModule } from './modules/health/health.module';
 import { TenantsModule } from './modules/tenants/tenants.module';
+import { ToolsModule } from './tools/tools.module';
+import { AgentsModule } from './modules/agents/agents.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { TenantsModule } from './modules/tenants/tenants.module';
     AuditModule,
     HealthModule,
     TenantsModule,
+    ToolsModule,
+    AgentsModule,
   ],
   providers: [
     {

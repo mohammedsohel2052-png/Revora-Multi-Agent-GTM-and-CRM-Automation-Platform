@@ -6,6 +6,8 @@ import { IdentityResolutionAgent } from '../../agents/identity-resolution/identi
 import { EnrichmentAgent } from '../../agents/enrichment/enrichment.agent';
 import { QualificationAgent } from '../../agents/qualification/qualification.agent';
 import { ConversationAgent } from '../../agents/conversation/conversation.agent';
+import { BookingAgent } from '../../agents/booking/booking.agent';
+import { HumanHandoffAgent } from '../../agents/human-handoff/human-handoff.agent';
 import { SupervisorAgent } from '../../agents/supervisor.agent';
 import { ToolsModule } from '../../tools/tools.module';
 
@@ -19,6 +21,8 @@ import { ToolsModule } from '../../tools/tools.module';
     EnrichmentAgent,
     QualificationAgent,
     ConversationAgent,
+    BookingAgent,
+    HumanHandoffAgent,
     SupervisorAgent,
   ],
   exports: [
@@ -29,6 +33,8 @@ import { ToolsModule } from '../../tools/tools.module';
     EnrichmentAgent,
     QualificationAgent,
     ConversationAgent,
+    BookingAgent,
+    HumanHandoffAgent,
   ],
 })
 export class AgentsModule {}

@@ -4,6 +4,8 @@ import { eq, or, isNull } from 'drizzle-orm';
 import { SupervisorAgent, SwarmPipelineInput } from '../../agents/supervisor.agent';
 import { QualificationAgent, QualificationInput } from '../../agents/qualification/qualification.agent';
 import { ConversationAgent, ConversationTurnInput } from '../../agents/conversation/conversation.agent';
+import { BookingAgent, BookingAgentInput } from '../../agents/booking/booking.agent';
+import { HumanHandoffAgent, HumanHandoffInput } from '../../agents/human-handoff/human-handoff.agent';
 import { ToolRegistryService } from '../../tools/tool-registry.service';
 import { randomUUID } from 'crypto';
 
@@ -15,6 +17,8 @@ export class AgentsService {
     private readonly supervisorAgent: SupervisorAgent,
     private readonly qualificationAgent: QualificationAgent,
     private readonly conversationAgent: ConversationAgent,
+    private readonly bookingAgent: BookingAgent,
+    private readonly humanHandoffAgent: HumanHandoffAgent,
     private readonly toolRegistry: ToolRegistryService,
   ) {}
 
@@ -48,6 +52,23 @@ export class AgentsService {
     return await this.conversationAgent.execute(input, {
       tenantId,
       traceId: `tr_conv_${randomUUID().slice(0, 8)}`,
+      conversationId: input.conversationId,
+      leadId: input.leadId,
+    });
+  }
+
+  async bookMeeting(tenantId: string, input: BookingAgentInput) {
+    return await this.bookingAgent.execute(input, {
+      tenantId,
+      traceId: `tr_book_${randomUUID().slice(0, 8)}`,
+      leadId: input.leadId,
+    });
+  }
+
+  async evaluateHumanHandoff(tenantId: string, input: HumanHandoffInput) {
+    return await this.humanHandoffAgent.execute(input, {
+      tenantId,
+      traceId: `tr_handoff_${randomUUID().slice(0, 8)}`,
       conversationId: input.conversationId,
       leadId: input.leadId,
     });

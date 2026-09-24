@@ -9,6 +9,7 @@ import { TenantsModule } from './modules/tenants/tenants.module';
 import { ToolsModule } from './tools/tools.module';
 import { AgentsModule } from './modules/agents/agents.module';
 import { WebhooksModule } from './modules/webhooks/webhooks.module';
+import { WorkflowsModule } from './modules/workflows/workflows.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { WebhooksModule } from './modules/webhooks/webhooks.module';
     ToolsModule,
     AgentsModule,
     WebhooksModule,
+    WorkflowsModule,
   ],
   providers: [
     {

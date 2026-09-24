@@ -347,9 +347,59 @@ Or add permanently via System Properties → Environment Variables.
 - `apps/api/src/modules/webhooks/webhooks.service.ts`
 - `apps/api/src/modules/webhooks/webhooks.controller.ts`
 - `apps/api/src/modules/webhooks/webhooks.module.ts`
-- `apps/api/src/agents/enrichment/enrichment.agent.ts`
-- `apps/api/src/agents/identity-resolution/identity-resolution.agent.ts`
-- `apps/api/src/agents/supervisor.agent.ts`
+---
+
+## 2026-09-24 — Phase 4: Conversational Sales Engine & Meeting Booking Workflows
+
+### [2026-09-24] — Meeting Booking Agent, Human Handoff & SLA Engine Built and Tested
+**Who:** Antigravity AI  
+**Phase:** Phase 4 (Conversational Workflow & Meeting Booking)  
+**Type:** Feature | Security | Test
+
+**What happened:**
+1. **Meeting Booking Agent (`apps/api/src/agents/booking/`):**
+   - Built [`BookingAgent`](file:///c:/PROJECTS/Revora%20%E2%80%94%20Multi-Agent%20GTM%20and%20CRM%20Automation%20Platform/apps/api/src/agents/booking/booking.agent.ts) coordinating calendar reservations and meeting link generation.
+   - Automatically compiles pre-call briefing dossiers for human sales reps:
+     - Lead background, company, industry, headcount
+     - Deterministic ICP fit score & intent score breakdown
+     - Extracted pain points & buying signals
+     - Tailored conversation talk track
+   - Transitions lead status to `meeting_booked` and updates CRM tasking.
+
+2. **Human Handoff Agent (`apps/api/src/agents/human-handoff/`):**
+   - Built [`HumanHandoffAgent`](file:///c:/PROJECTS/Revora%20%E2%80%94%20Multi-Agent%20GTM%20and%20CRM%20Automation%20Platform/apps/api/src/agents/human-handoff/human-handoff.agent.ts) monitoring prospect communication for:
+     - Explicit representative requests ("talk to a human", "speak with someone", "transfer me") ➡️ triggers `high` urgency handoff.
+     - Strong frustration/anger sentiment ("frustrated", "terrible", "waste of time", "annoyed") ➡️ triggers `critical` urgency handoff.
+     - Complex enterprise procurement/compliance questions (DPA, SOC2 Type II, custom contract).
+   - Halts autonomous messaging on the conversation thread (`conversations.status = 'human_handoff'`).
+   - Synthesizes root-cause summary and suggested opening empathetic message for the sales rep.
+
+3. **Conversation SLA & Stale Thread Manager (`apps/api/src/modules/workflows/`):**
+   - Built [`ConversationSlaService`](file:///c:/PROJECTS/Revora%20%E2%80%94%20Multi-Agent%20GTM%20and%20CRM%20Automation%20Platform/apps/api/src/modules/workflows/conversation-sla.service.ts) to detect prospect threads inactive for > 48 hours.
+   - Automatically marks thread as `stale` and transitions lead to `nurture` cadence with immutable audit logging.
+
+4. **New Tool Definitions (`apps/api/src/tools/definitions/`):**
+   - [`book_calendar_meeting`](file:///c:/PROJECTS/Revora%20%E2%80%94%20Multi-Agent%20GTM%20and%20CRM%20Automation%20Platform/apps/api/src/tools/definitions/book-calendar-meeting.tool.ts)
+   - [`trigger_human_handoff`](file:///c:/PROJECTS/Revora%20%E2%80%94%20Multi-Agent%20GTM%20and%20CRM%20Automation%20Platform/apps/api/src/tools/definitions/trigger-human-handoff.tool.ts)
+
+5. **REST API Expansion (`apps/api/src/modules/agents/`):**
+   - `POST /api/v1/agents/booking/book` — Coordinates calendar reservation and generates briefing dossier
+   - `POST /api/v1/agents/handoff/evaluate` — Evaluates prospect message for human handoff or sentiment frustration
+
+6. **Automated Test Suite Expansion (`apps/api/test/agent-runtime.spec.ts`):**
+   - Added unit tests for meeting booking, sales briefing generation, explicit human transfer, and frustration detection.
+   - All 13 unit tests passing!
+
+**Files affected:**
+- `apps/api/src/tools/definitions/book-calendar-meeting.tool.ts`
+- `apps/api/src/tools/definitions/trigger-human-handoff.tool.ts`
+- `apps/api/src/tools/tool-registry.service.ts`
+- `apps/api/src/agents/booking/booking.agent.ts`
+- `apps/api/src/agents/human-handoff/human-handoff.agent.ts`
+- `apps/api/src/modules/workflows/conversation-sla.service.ts`
+- `apps/api/src/modules/workflows/workflows.module.ts`
+- `apps/api/src/modules/agents/agents.service.ts`
+- `apps/api/src/modules/agents/agents.controller.ts`
 - `apps/api/src/modules/agents/agents.module.ts`
 - `apps/api/src/app.module.ts`
 - `apps/api/test/agent-runtime.spec.ts`

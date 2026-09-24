@@ -3,6 +3,8 @@ import { AuditService } from '../src/modules/audit/audit.service';
 import { QualificationAgent } from '../src/agents/qualification/qualification.agent';
 import { ConversationAgent } from '../src/agents/conversation/conversation.agent';
 import { EnrichmentAgent } from '../src/agents/enrichment/enrichment.agent';
+import { BookingAgent } from '../src/agents/booking/booking.agent';
+import { HumanHandoffAgent } from '../src/agents/human-handoff/human-handoff.agent';
 import { WebhooksService } from '../src/modules/webhooks/webhooks.service';
 import { randomUUID } from 'crypto';
 
@@ -299,6 +301,114 @@ describe('Revora Agent Runtime & Safety Engine', () => {
 
       const isInvalid = webhooksService.verifySignature('instagram', body, 'sha256=wrong_digest');
       expect(isInvalid).toBe(false);
+    });
+  });
+
+  describe('BookingAgent (Calendar Coordination & Pre-Meeting Briefing)', () => {
+    let bookingAgent: BookingAgent;
+
+    beforeEach(() => {
+      bookingAgent = new BookingAgent(toolRegistry);
+    });
+
+    it('should coordinate meeting slot and compile detailed sales briefing dossier', async () => {
+      const ctx = {
+        tenantId: randomUUID(),
+        traceId: 'tr_book_1',
+        leadId: randomUUID(),
+      };
+
+      const result = await bookingAgent.execute(
+        {
+          leadId: ctx.leadId,
+          contactName: 'Elena Rostova',
+          contactEmail: 'elena@vanguard.io',
+          companyName: 'Vanguard AI',
+          industry: 'Enterprise Software',
+          companySize: '500+',
+          icpFitScore: 92,
+          intentScore: 88,
+          buyingSignals: ['Hiring 20 SDRs', 'Immediate Q4 budget'],
+        },
+        ctx,
+      );
+
+      expect(result.status).toBe('booked');
+      expect(result.bookingId).toBeDefined();
+      expect(result.meetingUrl).toContain('meet.google.com');
+      expect(result.preMeetingBriefing.attendee).toBe('Elena Rostova');
+      expect(result.preMeetingBriefing.fitAssessment).toContain('ICP Fit Score: 92/100');
+      expect(result.preMeetingBriefing.recommendedTalkTrack.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('HumanHandoffAgent (Frustration & Explicit Transfer Detection)', () => {
+    let handoffAgent: HumanHandoffAgent;
+
+    beforeEach(() => {
+      handoffAgent = new HumanHandoffAgent(toolRegistry);
+    });
+
+    it('should trigger handoff when prospect explicitly asks for a human', async () => {
+      const ctx = {
+        tenantId: randomUUID(),
+        traceId: 'tr_handoff_1',
+        conversationId: randomUUID(),
+      };
+
+      const result = await handoffAgent.execute(
+        {
+          conversationId: ctx.conversationId,
+          contactName: 'Marcus',
+          inboundMessage: 'Can you please transfer me to a real person or representative?',
+        },
+        ctx,
+      );
+
+      expect(result.shouldHandoff).toBe(true);
+      expect(result.urgency).toBe('high');
+      expect(result.reason).toContain('human representative');
+      expect(result.suggestedOpeningReply).toContain('account team');
+    });
+
+    it('should trigger critical handoff when frustration is detected', async () => {
+      const ctx = {
+        tenantId: randomUUID(),
+        traceId: 'tr_handoff_2',
+        conversationId: randomUUID(),
+      };
+
+      const result = await handoffAgent.execute(
+        {
+          conversationId: ctx.conversationId,
+          contactName: 'Chloe',
+          inboundMessage: 'This is completely terrible and a waste of time. I am annoyed.',
+        },
+        ctx,
+      );
+
+      expect(result.shouldHandoff).toBe(true);
+      expect(result.urgency).toBe('critical');
+      expect(result.suggestedOpeningReply).toContain('senior account lead');
+    });
+
+    it('should not trigger handoff for normal commercial inquiries', async () => {
+      const ctx = {
+        tenantId: randomUUID(),
+        traceId: 'tr_handoff_3',
+        conversationId: randomUUID(),
+      };
+
+      const result = await handoffAgent.execute(
+        {
+          conversationId: ctx.conversationId,
+          contactName: 'Siddharth',
+          inboundMessage: 'What are the main architectural differences in your database setup?',
+        },
+        ctx,
+      );
+
+      expect(result.shouldHandoff).toBe(false);
     });
   });
 });

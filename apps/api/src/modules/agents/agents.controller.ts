@@ -40,4 +40,16 @@ export class AgentsController {
   async testReply(@CurrentTenant() tenantId: string, @Body() body: any) {
     return await this.agentsService.testConversationTurn(tenantId, body);
   }
+
+  @Post('booking/book')
+  @ApiOperation({ summary: 'Coordinate meeting booking and pre-call briefing dossier' })
+  async bookMeeting(@CurrentTenant() tenantId: string, @Body() body: any) {
+    return await this.agentsService.bookMeeting(tenantId, body);
+  }
+
+  @Post('handoff/evaluate')
+  @ApiOperation({ summary: 'Evaluate prospect message for human handoff or sentiment frustration' })
+  async evaluateHandoff(@CurrentTenant() tenantId: string, @Body() body: any) {
+    return await this.agentsService.evaluateHumanHandoff(tenantId, body);
+  }
 }

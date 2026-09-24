@@ -6,6 +6,8 @@ import { updateQualificationTool } from './definitions/update-qualification.tool
 import { createApprovalRequestTool } from './definitions/create-approval-request.tool';
 import { draftOutboundMessageTool } from './definitions/draft-outbound-message.tool';
 import { checkCalendarTool } from './definitions/check-calendar.tool';
+import { bookCalendarMeetingTool } from './definitions/book-calendar-meeting.tool';
+import { triggerHumanHandoffTool } from './definitions/trigger-human-handoff.tool';
 
 @Injectable()
 export class ToolRegistryService {
@@ -18,6 +20,8 @@ export class ToolRegistryService {
     this.registerTool(createApprovalRequestTool);
     this.registerTool(draftOutboundMessageTool);
     this.registerTool(checkCalendarTool);
+    this.registerTool(bookCalendarMeetingTool);
+    this.registerTool(triggerHumanHandoffTool);
   }
 
   registerTool(tool: AgentTool) {

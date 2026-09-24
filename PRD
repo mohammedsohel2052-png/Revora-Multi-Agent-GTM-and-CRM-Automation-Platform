@@ -1,0 +1,1899 @@
+Master PRD: GTM Intelligence OS
+Product name: GTM Intelligence OS
+Document type: Product Requirements Document
+Version: 1.0
+Target: Portfolio-grade MVP evolving into a production SaaS
+Primary users: Founders, freelancers, agencies, sales teams, and small businesses
+Core idea: A multi-tenant, multi-agent platform that captures leads, understands buying intent, automates sales workflows, updates CRM records, and involves humans when decisions require approval.
+
+1. Product Overview
+1.1 Problem
+Small businesses and agencies receive leads from Instagram, websites, email, WhatsApp, forms, and advertisements. Their customer data is usually fragmented, follow-ups are manual, CRM records become outdated, and salespeople lack context about which leads deserve attention.
+
+Existing tools often solve only one part of the process:
+
+A CRM stores customer information but does not actively execute workflows.
+
+A chatbot answers messages but does not understand the entire sales pipeline.
+
+Marketing tools generate leads but do not reliably qualify or follow them up.
+
+Automation platforms connect tools but often lack business reasoning, approvals, and explainability.
+
+The product will combine CRM, GTM operations, event-driven workflows, and specialized AI agents into one coordinated revenue system.
+
+The platform should prioritize unified data, intent signals, CRM-ready enrichment, and orchestration because automating poor-quality data can simply amplify incorrect decisions.
+
+1.2 Product vision
+Build a reliable AI-powered GTM operating system that helps a business move from:
+
+text
+Lead arrives
+→ Lead is understood
+→ Lead is qualified
+→ Lead receives the right response
+→ Meeting or payment is completed
+→ CRM stays updated
+→ Revenue outcome is measured
+1.3 Portfolio objective
+The project should demonstrate more than chatbot development. It should prove capability in:
+
+Multi-agent architecture.
+
+Event-driven systems.
+
+Durable workflow execution.
+
+Multi-tenancy.
+
+OAuth and third-party integrations.
+
+CRM and data modeling.
+
+Human-in-the-loop design.
+
+AI evaluation.
+
+Observability and auditability.
+
+Secure tool execution.
+
+Revenue analytics.
+
+Production-focused engineering.
+
+Every sensitive action should be attributable to a tenant, user, agent, task, tool, policy decision, approval state, and outcome.
+
+2. Goals and Non-Goals
+2.1 Goals
+The platform must:
+
+Capture leads from multiple channels.
+
+Resolve duplicate contacts across channels.
+
+Enrich leads and accounts with useful business information.
+
+Score leads using transparent rules and AI analysis.
+
+Route work to specialized agents.
+
+Generate personalized responses and outreach.
+
+Schedule follow-ups for inactive conversations.
+
+Support calendar booking.
+
+Support payment initiation and payment confirmation.
+
+Keep CRM records synchronized.
+
+Provide human approval for risky actions.
+
+Provide complete agent execution traces.
+
+Evaluate agent performance using test cases.
+
+Support tenant-specific agents, offers, rules, prompts, and integrations.
+
+Report funnel, pipeline, cost, and revenue metrics.
+
+2.2 Non-goals for the first release
+The initial release will not attempt to:
+
+Replace a full enterprise CRM.
+
+Send unlimited autonomous outbound messages.
+
+Guarantee conversion or revenue.
+
+Scrape websites or social networks in violation of provider policies.
+
+Process sensitive financial or health information without proper controls.
+
+Build a general-purpose autonomous agent platform for every industry.
+
+Support every social, email, calendar, and payment provider at launch.
+
+Allow agents to execute unrestricted code.
+
+3. Users and Roles
+3.1 Workspace owner
+Can:
+
+Create and configure a workspace.
+
+Connect integrations.
+
+Define products, services, offers, and pricing.
+
+Configure ICP rules.
+
+Set agent permissions.
+
+Review analytics and costs.
+
+Manage team members.
+
+3.2 Sales manager
+Can:
+
+View leads and pipeline.
+
+Review agent recommendations.
+
+Approve or reject actions.
+
+Assign leads to team members.
+
+Inspect conversations and traces.
+
+Configure qualification rules.
+
+3.3 Sales representative
+Can:
+
+View assigned leads.
+
+Continue conversations.
+
+Approve or edit agent messages.
+
+Book meetings.
+
+Update deal stages.
+
+Add notes and outcomes.
+
+3.4 Reviewer or approver
+Can:
+
+Review pending AI actions.
+
+Approve, edit, reject, or request regeneration.
+
+Add rejection reasons.
+
+Resume or stop workflows.
+
+3.5 Platform administrator
+Can:
+
+Manage tenants.
+
+Monitor system health.
+
+Inspect failed workflows.
+
+View platform-level usage.
+
+Manage model and provider settings.
+
+Review security and audit events.
+
+4. Core Product Modules
+4.1 Workspace and tenant management
+Each business operates in an isolated workspace.
+
+Each workspace contains:
+
+Workspace profile.
+
+Team members.
+
+Roles and permissions.
+
+Connected integrations.
+
+Agents.
+
+Offers and products.
+
+ICP configuration.
+
+Conversation policies.
+
+CRM records.
+
+Workflows.
+
+Usage and billing data.
+
+Requirements
+Every database record must include tenant_id.
+
+Tenant access must be checked at the API and database layers.
+
+Users must not access another tenant’s contacts, conversations, credentials, traces, or files.
+
+Tenant-specific prompt, memory, and knowledge retrieval must be enforced.
+
+Usage and costs must be calculated per tenant.
+
+Strict data, secret, workspace, and cost isolation is a core requirement for enterprise-ready multi-tenant agent platforms.
+
+4.2 CRM module
+The CRM is the platform’s central system of record.
+
+Core entities
+Contact.
+
+Company.
+
+Lead.
+
+Conversation.
+
+Message.
+
+Activity.
+
+Opportunity.
+
+Pipeline.
+
+Deal stage.
+
+Task.
+
+Meeting.
+
+Payment.
+
+Agent run.
+
+Approval request.
+
+Audit event.
+
+Contact fields
+Name.
+
+Email.
+
+Phone.
+
+Social profile IDs.
+
+Company.
+
+Job title.
+
+Location.
+
+Tags.
+
+Lead source.
+
+Consent status.
+
+Owner.
+
+Created date.
+
+Last activity date.
+
+Lead fields
+Lead status.
+
+Lifecycle stage.
+
+Intent score.
+
+ICP fit score.
+
+Qualification status.
+
+Buying signals.
+
+Budget status.
+
+Urgency.
+
+Pain points.
+
+Next action.
+
+Assigned owner.
+
+Source channel.
+
+Last agent action.
+
+Pipeline stages
+text
+New
+→ Contacted
+→ Engaged
+→ Qualified
+→ Meeting pending
+→ Meeting booked
+→ Proposal sent
+→ Negotiation
+→ Won
+→ Lost
+→ Nurture
+CRM requirements
+Create or update records idempotently.
+
+Prevent duplicate contacts where possible.
+
+Maintain a full activity timeline.
+
+Allow manual edits.
+
+Record the source of every field value.
+
+Record whether a value came from a user, integration, rule, or AI agent.
+
+Preserve history when a field changes.
+
+Support import and export later.
+
+Expose CRM data through permission-controlled tools.
+
+4.3 Integration layer
+The platform must support incoming and outgoing integration events.
+
+Initial integrations
+Instagram or social messaging provider.
+
+Website lead form.
+
+Email provider.
+
+Google Calendar.
+
+Stripe.
+
+Slack or email notifications.
+
+Optional external CRM such as HubSpot or Zoho.
+
+Integration requirements
+OAuth-based connection flow.
+
+Encrypted credential storage.
+
+Refresh-token handling.
+
+Webhook verification.
+
+Provider rate-limit handling.
+
+Retry and backoff.
+
+Idempotency keys.
+
+Webhook event deduplication.
+
+Connection health status.
+
+Reconnection flow.
+
+Manual sync and reconciliation.
+
+Provider-specific error visibility.
+
+Do not expose raw access tokens to agents. Agents should use controlled tools such as create_calendar_event or update_crm_lead, not arbitrary provider APIs.
+
+5. Multi-Agent System
+5.1 Agent design principles
+Each agent must have:
+
+One clear responsibility.
+
+A defined input schema.
+
+A defined output schema.
+
+Approved tools.
+
+Permission scope.
+
+Maximum execution depth.
+
+Token and cost limits.
+
+Timeout limits.
+
+Retry policy.
+
+Human escalation conditions.
+
+Versioned instructions.
+
+Traceable actions.
+
+Agents should not independently modify the same business state without coordination. A shared context layer is necessary so that one agent knows what another agent has already done.
+
+5.2 Agent registry
+The platform must maintain an agent registry containing:
+
+Agent ID.
+
+Agent name.
+
+Description.
+
+Purpose.
+
+Version.
+
+Model provider.
+
+Model name.
+
+System instructions.
+
+Tool permissions.
+
+Input schema.
+
+Output schema.
+
+Enabled status.
+
+Autonomy level.
+
+Cost limit.
+
+Tenant association.
+
+Created and updated timestamps.
+
+5.3 Required agents
+A. Lead Intake Agent
+Purpose: Convert incoming events into normalized CRM records.
+
+Inputs:
+
+Channel.
+
+Provider event ID.
+
+Sender details.
+
+Message or form content.
+
+Account or page ID.
+
+Timestamp.
+
+Attachments, if available.
+
+Actions:
+
+Validate payload.
+
+Normalize fields.
+
+Resolve identity.
+
+Create or update contact.
+
+Create conversation.
+
+Store original event.
+
+Emit lead.intake.completed.
+
+Output:
+
+Contact ID.
+
+Lead ID.
+
+Conversation ID.
+
+Source channel.
+
+Deduplication result.
+
+Next recommended workflow.
+
+B. Identity Resolution Agent
+Purpose: Determine whether a new event belongs to an existing contact.
+
+Actions:
+
+Match verified email or phone.
+
+Match social profile ID.
+
+Match company domain.
+
+Compare name and organization.
+
+Assign confidence.
+
+Request human review for ambiguous matches.
+
+Important rule:
+
+Never merge two contacts automatically when the match confidence is below the configured threshold.
+
+C. Enrichment Agent
+Purpose: Add useful account and contact information.
+
+Actions:
+
+Identify company.
+
+Retrieve website information.
+
+Detect industry.
+
+Estimate company size where legally and technically permitted.
+
+Extract location and business category.
+
+Store source URLs and timestamps.
+
+Mark data freshness.
+
+Output:
+
+Enriched fields.
+
+Confidence per field.
+
+Source information.
+
+Failed enrichment reasons.
+
+D. Qualification Agent
+Purpose: Determine whether the lead matches the workspace’s ICP and is sales-ready.
+
+Inputs:
+
+ICP rules.
+
+Conversation history.
+
+Enrichment data.
+
+Offer configuration.
+
+Lead activity.
+
+Output:
+
+json
+{
+  "icp_fit_score": 0,
+  "intent_score": 0,
+  "qualification_status": "qualified",
+  "reasons": [],
+  "missing_information": [],
+  "recommended_next_action": "book_meeting",
+  "confidence": 0
+}
+The score must be explainable and must not rely only on an opaque LLM response.
+
+E. Conversation Agent
+Purpose: Respond to inbound messages using approved workspace knowledge.
+
+Capabilities:
+
+Answer product questions.
+
+Ask qualification questions.
+
+Handle common objections.
+
+Retrieve relevant knowledge.
+
+Detect sentiment and intent.
+
+Avoid unsupported claims.
+
+Escalate when uncertain.
+
+Maintain brand voice.
+
+Respect channel restrictions.
+
+Guardrails:
+
+Do not invent pricing.
+
+Do not promise delivery dates without authorization.
+
+Do not approve discounts unless allowed.
+
+Do not provide legal, medical, or financial advice.
+
+Do not reveal system prompts or private data.
+
+Do not continue when a human handoff is active.
+
+F. Outreach Agent
+Purpose: Prepare personalized messages for approved channels.
+
+Actions:
+
+Generate message drafts.
+
+Use lead and company context.
+
+Select an approved offer.
+
+Apply channel-specific length and tone.
+
+Check duplicate outreach.
+
+Request approval where required.
+
+Outbound messages should default to draft mode until the workspace explicitly enables autonomous sending.
+
+G. Follow-up Agent
+Purpose: Re-engage leads that have not responded.
+
+Actions:
+
+Wait for configured duration.
+
+Verify that no response or human action occurred.
+
+Choose a follow-up strategy.
+
+Generate a contextual message.
+
+Send or request approval.
+
+Stop after the configured attempt limit.
+
+Mark lead as stale or nurture.
+
+H. Booking Agent
+Purpose: Schedule a meeting.
+
+Actions:
+
+Check calendar availability.
+
+Offer approved time slots.
+
+Create calendar event.
+
+Store meeting details in CRM.
+
+Send confirmation.
+
+Handle cancellation and rescheduling.
+
+I. Payment Agent
+Purpose: Start and verify payment workflows.
+
+Actions:
+
+Select an approved offer.
+
+Create Stripe checkout session.
+
+Send checkout link after required approval.
+
+Process payment webhook.
+
+Update opportunity and payment status.
+
+Trigger onboarding after successful payment.
+
+The agent must never mark an opportunity as paid based only on a message from a customer. Payment status must come from a verified provider event.
+
+J. Human Handoff Agent
+Purpose: Route conversations to humans when automation should stop.
+
+Trigger conditions:
+
+Low confidence.
+
+Repeated misunderstanding.
+
+High-value opportunity.
+
+Sensitive topic.
+
+Custom proposal request.
+
+Refund or complaint.
+
+Discount request.
+
+User explicitly asks for a human.
+
+Policy violation risk.
+
+Actions:
+
+Pause automated responses.
+
+Create approval or handoff task.
+
+Summarize conversation.
+
+Highlight unresolved questions.
+
+Assign a human owner.
+
+Resume only after a human decision.
+
+K. Analytics Agent
+Purpose: Generate business and operational insights.
+
+Reports:
+
+Lead volume.
+
+Qualified leads.
+
+Conversion rate.
+
+Pipeline value.
+
+Revenue influenced.
+
+Channel performance.
+
+Agent performance.
+
+Human handoff rate.
+
+Response time.
+
+Cost per workflow.
+
+Stale-lead recovery.
+
+Churn and retention, when available.
+
+6. Workflow Requirements
+6.1 Event-driven architecture
+The platform should use typed domain events.
+
+Example events:
+
+text
+lead.received
+lead.created
+lead.duplicate.detected
+lead.enrichment.requested
+lead.enrichment.completed
+lead.qualified
+conversation.message.received
+conversation.reply.drafted
+approval.requested
+approval.approved
+approval.rejected
+followup.scheduled
+conversation.marked_stale
+meeting.requested
+meeting.booked
+payment.checkout_created
+payment.completed
+payment.failed
+human.handoff.requested
+crm.sync.failed
+Every event should include:
+
+Event ID.
+
+Tenant ID.
+
+Entity ID.
+
+Event type.
+
+Schema version.
+
+Timestamp.
+
+Correlation ID.
+
+Idempotency key.
+
+Source.
+
+Payload.
+
+6.2 Lead intake workflow
+text
+Receive provider event
+→ Verify signature
+→ Check idempotency key
+→ Normalize payload
+→ Resolve contact identity
+→ Create or update CRM records
+→ Store message
+→ Load workspace configuration
+→ Run qualification
+→ Route next action
+→ Emit workflow result
+Acceptance criteria:
+
+Duplicate webhook events do not create duplicate leads.
+
+Failed enrichment does not lose the original lead.
+
+Every step is retryable.
+
+The workflow can resume after deployment or server failure.
+
+The complete execution is visible in the trace.
+
+6.3 Conversation workflow
+text
+Message received
+→ Load conversation state
+→ Check human-handoff lock
+→ Retrieve relevant knowledge
+→ Classify intent
+→ Generate response
+→ Apply policy checks
+→ Decide draft, send, or escalate
+→ Save message and action
+→ Update CRM
+6.4 Stale conversation workflow
+text
+Conversation becomes inactive
+→ Wait configured duration
+→ Check for new messages
+→ Check whether the opportunity changed
+→ Generate follow-up
+→ Apply sending policy
+→ Send or request approval
+→ Wait again
+→ Mark nurture, cold, or escalate
+6.5 Human approval workflow
+text
+Agent proposes action
+→ Policy engine evaluates risk
+→ Create approval request
+→ Notify reviewer
+→ Pause workflow
+→ Reviewer approves, edits, rejects, or expires request
+→ Resume or terminate workflow
+→ Record decision in audit log
+6.6 Booking workflow
+text
+Lead requests a meeting
+→ Check qualification status
+→ Retrieve calendar availability
+→ Offer slots
+→ Lead selects slot
+→ Create calendar event
+→ Update CRM
+→ Send confirmation
+→ Schedule reminder
+6.7 Payment workflow
+text
+Lead accepts offer
+→ Verify offer and price
+→ Create checkout session
+→ Request approval if required
+→ Send payment link
+→ Receive verified Stripe webhook
+→ Update payment and opportunity
+→ Trigger onboarding
+7. GTM Configuration
+Each workspace must be able to configure:
+
+7.1 ICP
+Target industries.
+
+Company size.
+
+Geography.
+
+Roles.
+
+Technologies used.
+
+Business problems.
+
+Exclusion criteria.
+
+Minimum fit score.
+
+7.2 Offers
+Offer name.
+
+Description.
+
+Price.
+
+Currency.
+
+Billing type.
+
+Benefits.
+
+Delivery timeline.
+
+Eligibility.
+
+Allowed discounts.
+
+Payment link configuration.
+
+Required approval level.
+
+7.3 Qualification framework
+Required questions.
+
+Budget categories.
+
+Urgency categories.
+
+Buying authority.
+
+Pain-point categories.
+
+Qualification thresholds.
+
+Handoff conditions.
+
+7.4 Brand voice
+Tone.
+
+Vocabulary.
+
+Forbidden phrases.
+
+Response length.
+
+Language preferences.
+
+Example messages.
+
+Escalation style.
+
+7.5 Channel policies
+Allowed channels.
+
+Sending hours.
+
+Daily message limits.
+
+Follow-up limits.
+
+Opt-out handling.
+
+Approval requirements.
+
+Provider-specific restrictions.
+
+8. Knowledge and Memory
+8.1 Knowledge base
+Workspace users can upload or create:
+
+Product documentation.
+
+Service descriptions.
+
+FAQs.
+
+Pricing information.
+
+Case studies.
+
+Objection-handling guides.
+
+Sales playbooks.
+
+Brand guidelines.
+
+Policies.
+
+Each document should have:
+
+Tenant ID.
+
+Version.
+
+Source.
+
+Visibility.
+
+Created date.
+
+Updated date.
+
+Embedding status.
+
+Freshness status.
+
+8.2 Memory types
+Conversation memory: Previous messages and decisions.
+
+Contact memory: Preferences, objections, and history.
+
+Company memory: Industry, size, products, and account notes.
+
+Offer memory: Products, pricing, eligibility, and policies.
+
+Workflow memory: Previous agent actions and outcomes.
+
+Learning memory: Approved examples and rejected examples.
+
+8.3 Memory safety
+Never mix tenant memories.
+
+Never retrieve private internal notes into customer messages.
+
+Show memory source when it affects a decision.
+
+Support deletion and retention policies.
+
+Do not store unnecessary personal information.
+
+Allow users to correct incorrect memory.
+
+9. Agent Governance and Security
+9.1 Tool permissions
+Every tool must define:
+
+Tool name.
+
+Description.
+
+Required input schema.
+
+Allowed agents.
+
+Allowed tenants.
+
+Risk level.
+
+Read or write classification.
+
+Approval requirement.
+
+Rate limit.
+
+Timeout.
+
+Audit requirements.
+
+Example:
+
+Tool	Type	Default approval
+Read CRM contact	Read	No
+Enrich company	External read	No or configurable
+Update lead score	Write	No
+Send outbound message	External write	Yes
+Create calendar event	External write	Configurable
+Create payment link	Financial action	Yes
+Issue refund	High-risk financial action	Always human
+Delete CRM contact	Destructive action	Always human
+9.2 Policy engine
+The policy engine must evaluate:
+
+Tenant policy.
+
+User role.
+
+Agent identity.
+
+Tool risk.
+
+Lead value.
+
+Channel rules.
+
+Rate limits.
+
+Time restrictions.
+
+Approval state.
+
+Data sensitivity.
+
+The policy engine must execute before external side effects.
+
+9.3 Audit log
+Record:
+
+Tenant ID.
+
+User ID.
+
+Agent ID.
+
+Workflow ID.
+
+Task ID.
+
+Trace ID.
+
+Tool name.
+
+Input parameters.
+
+Redacted output.
+
+Policy decision.
+
+Policy version.
+
+Approval status.
+
+Timestamp.
+
+Result.
+
+Error.
+
+Provider event ID.
+
+Agent security should cover data access, action execution, and generated output—not only login and API authentication.
+
+9.4 Safety controls
+Maximum agent turns.
+
+Maximum recursion depth.
+
+Token limit.
+
+Cost ceiling.
+
+Tool timeout.
+
+Retry limit.
+
+Rate limit.
+
+Duplicate-action prevention.
+
+Prompt injection detection.
+
+PII redaction.
+
+Secret redaction.
+
+Kill switch.
+
+Workflow cancellation.
+
+Human handoff lock.
+
+Governance primitives such as audit logs, policy enforcement, rate limits, depth bounds, RBAC, human approvals, and cost ceilings should exist at the platform layer.
+
+10. Observability
+10.1 Trace structure
+Each workflow should have:
+
+Root trace.
+
+Child agent spans.
+
+Model-call spans.
+
+Tool-call spans.
+
+Retrieval spans.
+
+Approval spans.
+
+Retry spans.
+
+Provider webhook spans.
+
+10.2 Dashboard metrics
+Workflow metrics
+Total runs.
+
+Successful runs.
+
+Failed runs.
+
+Retried steps.
+
+Average duration.
+
+P95 duration.
+
+Pending approvals.
+
+Timed-out workflows.
+
+AI metrics
+Input and output tokens.
+
+Model cost.
+
+Tool-call count.
+
+Agent confidence.
+
+Escalation rate.
+
+Hallucination or policy-failure rate.
+
+Average turns per conversation.
+
+Business metrics
+Leads received.
+
+Leads qualified.
+
+Meetings booked.
+
+Payments completed.
+
+Conversion rate.
+
+Pipeline value.
+
+Revenue influenced.
+
+Follow-up recovery rate.
+
+Production monitoring must capture model calls, tool calls, retries, handoffs, and finish reasons because standard application monitoring does not provide enough visibility into multi-step agent execution.
+
+11. Evaluation System
+11.1 Evaluation datasets
+Create test scenarios for:
+
+Normal product inquiry.
+
+Pricing question.
+
+Discount request.
+
+Angry customer.
+
+Unknown question.
+
+Human request.
+
+Competitor comparison.
+
+Booking request.
+
+Payment request.
+
+Unqualified lead.
+
+Duplicate lead.
+
+Prompt injection.
+
+Sensitive information request.
+
+11.2 Evaluation criteria
+Each test should evaluate:
+
+Correct intent.
+
+Correct qualification.
+
+Correct CRM update.
+
+Correct tool choice.
+
+Correct escalation.
+
+Response relevance.
+
+Factual accuracy.
+
+Policy compliance.
+
+Tone.
+
+Latency.
+
+Cost.
+
+11.3 Release gates
+A new agent or prompt version cannot be activated if:
+
+Qualification accuracy falls below threshold.
+
+Policy violations increase.
+
+Tool-call error rate increases.
+
+Hallucination rate exceeds threshold.
+
+Cost exceeds configured limit.
+
+Regression tests fail.
+
+11.4 Evaluation dashboard
+Show:
+
+Current version.
+
+Previous version.
+
+Pass rate.
+
+Failed scenarios.
+
+Average score.
+
+Cost comparison.
+
+Latency comparison.
+
+Human correction rate.
+
+Release history.
+
+12. Core User Experience
+12.1 Main screens
+Login and workspace selection.
+
+Workspace onboarding.
+
+CRM contacts.
+
+Leads and pipeline.
+
+Conversation inbox.
+
+Agent control center.
+
+Workflow builder.
+
+Pending approvals.
+
+Agent run explorer.
+
+Knowledge base.
+
+Integrations.
+
+Analytics dashboard.
+
+Evaluation dashboard.
+
+Audit log.
+
+Workspace settings.
+
+12.2 Onboarding flow
+text
+Create workspace
+→ Choose business type
+→ Define ICP
+→ Add offer
+→ Set brand voice
+→ Connect channel
+→ Connect calendar
+→ Connect Stripe
+→ Review agent permissions
+→ Run test lead
+→ Enable supervised mode
+12.3 Inbox requirements
+The inbox must show:
+
+Conversation.
+
+Contact profile.
+
+Company information.
+
+Lead score.
+
+Deal stage.
+
+Agent summary.
+
+Suggested next action.
+
+Pending approval status.
+
+Human ownership.
+
+Full activity timeline.
+
+13. Technical Architecture
+13.1 High-level architecture
+text
+Web Dashboard
+      ↓
+API Gateway
+      ↓
+Authentication and RBAC
+      ↓
+Domain Services
+      ├── CRM Service
+      ├── Agent Service
+      ├── Policy Service
+      ├── Integration Service
+      ├── Knowledge Service
+      ├── Evaluation Service
+      └── Analytics Service
+              ↓
+       Event Bus / Workflow Engine
+              ↓
+        Durable Agent Workflows
+              ↓
+  LLMs, tools, calendars, channels, payments
+13.2 Suggested stack
+Layer	Recommendation
+Frontend	Next.js, React, TypeScript
+Backend	Node.js with NestJS or modular TypeScript
+Database	PostgreSQL
+ORM	Drizzle or Prisma
+Workflow orchestration	Inngest
+Agent state machine	LangGraph, Mastra, or custom typed orchestrator
+Cache	Redis, if required
+Vector search	pgvector initially
+Authentication	Auth.js, Clerk, or an equivalent provider
+Observability	OpenTelemetry-compatible tracing
+Payments	Stripe
+Calendar	Google Calendar
+Integrations	Nango, Unipile, or provider-specific adapters
+Deployment	Docker and a cloud deployment platform
+CI/CD	GitHub Actions
+Testing	Vitest, Playwright, and integration tests
+13.3 Data model
+Core tables:
+
+text
+tenants
+users
+memberships
+roles
+agents
+agent_versions
+agent_tools
+tool_permissions
+workflows
+workflow_runs
+workflow_steps
+contacts
+companies
+leads
+conversations
+messages
+activities
+opportunities
+pipelines
+deal_stages
+offers
+knowledge_documents
+knowledge_chunks
+memories
+integrations
+oauth_credentials
+calendar_events
+payments
+approval_requests
+audit_events
+evaluation_datasets
+evaluation_cases
+evaluation_runs
+usage_events
+13.4 API examples
+text
+POST   /api/v1/leads
+GET    /api/v1/leads
+GET    /api/v1/leads/:id
+PATCH  /api/v1/leads/:id
+POST   /api/v1/leads/:id/qualify
+POST   /api/v1/conversations/:id/reply
+POST   /api/v1/approvals/:id/approve
+POST   /api/v1/approvals/:id/reject
+GET    /api/v1/agent-runs/:id
+POST   /api/v1/workflows/:id/execute
+POST   /api/v1/integrations/:provider/connect
+POST   /api/v1/webhooks/:provider
+GET    /api/v1/analytics/pipeline
+GET    /api/v1/evaluations
+14. Non-Functional Requirements
+14.1 Reliability
+Webhook processing must be idempotent.
+
+Failed steps must retry with backoff.
+
+Workflows must resume after application restarts.
+
+External side effects must use idempotency keys.
+
+Failed workflows must be visible and replayable.
+
+Provider outages must not destroy lead data.
+
+14.2 Performance
+Initial targets:
+
+API p95 response time below 500 ms for non-AI operations.
+
+Lead intake acknowledgment below 2 seconds.
+
+Agent response target below 10 seconds for normal conversations.
+
+Dashboard page load below 3 seconds.
+
+Workflow status updates visible within 5 seconds.
+
+Background enrichment may execute asynchronously.
+
+14.3 Scalability
+The system should support:
+
+Multiple tenants.
+
+Multiple agents per tenant.
+
+Multiple concurrent workflows.
+
+Queue-based background processing.
+
+Per-tenant rate limits.
+
+Per-tenant cost budgets.
+
+Horizontal API scaling.
+
+Separate worker scaling.
+
+14.4 Security
+Tenant isolation.
+
+RBAC.
+
+Encrypted credentials.
+
+HTTPS only.
+
+Signed webhook validation.
+
+Secret redaction.
+
+PII minimization.
+
+Audit logging.
+
+Input validation.
+
+SQL injection protection.
+
+Prompt injection defenses.
+
+Secure external tool execution.
+
+Backup and recovery strategy.
+
+14.5 Cost control
+Model selection by task complexity.
+
+Token budgets.
+
+Per-workflow cost ceiling.
+
+Tenant usage dashboard.
+
+Maximum agent turns.
+
+Caching for repeated retrieval.
+
+Batch enrichment.
+
+Fallback models.
+
+Alerts for unusual usage.
+
+15. MVP Definition
+The MVP is complete when a user can:
+
+Create a workspace.
+
+Configure an ICP and offer.
+
+Connect one lead source.
+
+Receive a lead event.
+
+Create or update a CRM contact.
+
+Run enrichment.
+
+Calculate an explainable score.
+
+Generate a response.
+
+Request human approval.
+
+Send the approved response.
+
+Update the CRM pipeline.
+
+Schedule a delayed follow-up.
+
+Book a calendar meeting.
+
+View the complete workflow trace.
+
+View a basic funnel dashboard.
+
+Review audit events.
+
+Run evaluation test cases.
+
+MVP demonstration scenario
+text
+A prospect sends an Instagram DM
+→ The system creates the lead
+→ Detects a duplicate or creates a contact
+→ Enriches the company
+→ Scores ICP fit and buying intent
+→ Generates a personalized reply
+→ Requests approval
+→ Sends the message
+→ Offers calendar slots
+→ Books a meeting
+→ Updates the CRM
+→ Displays the trace and revenue-stage change
+16. Portfolio Demo Requirements
+Your final demo should include these visible moments:
+
+Demo 1: Lead intake
+Show a real or simulated incoming event and the resulting CRM record.
+
+Demo 2: Multi-agent coordination
+Show the supervisor routing the task to intake, enrichment, qualification, conversation, and CRM agents.
+
+Demo 3: Human approval
+Show a risky action being paused, reviewed, edited, and approved.
+
+Demo 4: Durable waiting
+Show a workflow waiting for a response and resuming after a simulated event.
+
+Demo 5: Failure recovery
+Intentionally fail an external provider or tool call and show retry behavior.
+
+Demo 6: Explainability
+Show why the lead received its score and why a particular next action was selected.
+
+Demo 7: Evaluation
+Run test cases before and after a prompt change and display the result.
+
+Demo 8: Tenant isolation
+Show two workspaces and prove that their CRM records, knowledge, prompts, and traces are separated.
+
+17. Success Metrics
+Product metrics
+Number of active workspaces.
+
+Leads processed per workspace.
+
+CRM record creation success rate.
+
+Duplicate detection accuracy.
+
+Enrichment completion rate.
+
+Qualification accuracy.
+
+Agent response approval rate.
+
+Human handoff rate.
+
+Meeting booking rate.
+
+Payment completion rate.
+
+Follow-up recovery rate.
+
+Engineering metrics
+Workflow success rate.
+
+Webhook deduplication rate.
+
+Retry recovery rate.
+
+Mean time to recovery.
+
+P95 agent latency.
+
+Tool failure rate.
+
+Average cost per lead.
+
+Prompt regression rate.
+
+Audit-log completeness.
+
+Tenant-isolation test pass rate.
+
+Portfolio metrics
+For your resume, report actual measured results such as:
+
+Number of agents implemented.
+
+Number of workflow types.
+
+Number of integrations.
+
+Evaluation dataset size.
+
+Qualification accuracy.
+
+Workflow reliability.
+
+Average response latency.
+
+Cost per workflow.
+
+Number of automated test cases.
+
+Percentage of actions requiring human approval.
+
+18. Delivery Roadmap
+Phase 0: Research and design
+Define user journeys.
+
+Define event schemas.
+
+Define CRM entities.
+
+Define agent boundaries.
+
+Define tool permissions.
+
+Create architecture diagrams.
+
+Create threat model.
+
+Create evaluation dataset.
+
+Phase 1: Foundation
+Authentication.
+
+Tenant model.
+
+Workspace model.
+
+RBAC.
+
+PostgreSQL schema.
+
+Event contracts.
+
+Basic CRM.
+
+Audit event model.
+
+Phase 2: Agent runtime
+Agent registry.
+
+Tool registry.
+
+Supervisor routing.
+
+Agent execution state.
+
+Model adapter.
+
+Structured outputs.
+
+Retry and timeout handling.
+
+Basic traces.
+
+Phase 3: Lead workflow
+Lead intake.
+
+Identity resolution.
+
+Enrichment.
+
+Qualification.
+
+Explainable scoring.
+
+CRM updates.
+
+Phase 4: Conversation workflow
+Message inbox.
+
+Knowledge retrieval.
+
+Conversation agent.
+
+Policy checks.
+
+Draft generation.
+
+Human approval.
+
+Sending adapter.
+
+Stale follow-up.
+
+Phase 5: Booking and payment
+Calendar integration.
+
+Slot selection.
+
+Meeting creation.
+
+Stripe checkout.
+
+Verified payment webhooks.
+
+CRM and workflow updates.
+
+Phase 6: Production differentiation
+Agent control plane.
+
+Evaluation dashboard.
+
+Prompt versioning.
+
+Cost analytics.
+
+Full tracing.
+
+Identity resolution.
+
+Intent signal engine.
+
+Revenue attribution.
+
+Failure replay.
+
+Phase 7: Deployment and presentation
+Integration tests.
+
+Security testing.
+
+Load testing.
+
+Demo seed data.
+
+Architecture documentation.
+
+API documentation.
+
+Deployment guide.
+
+Resume bullet points.
+
+Portfolio case study.
+
+Recorded product walkthrough.
+
+19. Risks and Mitigations
+Risk	Mitigation
+Risk	Mitigation
+Hallucinated sales claims	Retrieval, structured offer data, confidence thresholds, human approval.
+Duplicate messages	Idempotency keys, message fingerprints, workflow locks.
+Wrong contact merge	Confidence threshold and human review.
+Cross-tenant data leak	Tenant-scoped queries, authorization middleware, isolation tests.
+Infinite agent loop	Maximum depth, turn limits, timeout, cost ceiling.
+Duplicate webhook processing	Provider event IDs and idempotent handlers.
+Provider API failure	Retries, backoff, dead-letter queue, reconciliation.
+Prompt injection	Treat external content as untrusted data; restrict tool permissions.
+Incorrect payment status	Trust only verified Stripe webhook events.
+Outdated enrichment	Store source and freshness timestamps.
+Poor CRM data quality	Validation, field provenance, duplicate detection.
+High AI costs	Smaller models for classification, caching, budgets, and usage alerts.
+Over-engineering	Deliver one complete workflow before expanding the platform.

@@ -45,7 +45,7 @@ export class LeadIntakeAgent extends BaseAgent<RawLeadIntakeInput, IntakeResult>
     const tenantId = ctx.tenantId;
 
     // 1. Resolve or Create Contact
-    let existingContact = null;
+    let existingContact: any = null;
     if (input.sender.email || input.sender.phone) {
       existingContact = await db.query.contacts.findFirst({
         where: (c, { eq, and, or }) =>

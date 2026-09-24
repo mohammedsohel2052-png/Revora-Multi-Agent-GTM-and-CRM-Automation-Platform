@@ -69,7 +69,7 @@ export class EnrichmentAgent extends BaseAgent<EnrichmentInput, EnrichmentResult
     const tenantId = ctx.tenantId;
 
     // Check if company already exists under tenant
-    let existingCompany = null;
+    let existingCompany: any = null;
     if (extractedDomain) {
       existingCompany = await db.query.companies.findFirst({
         where: (c, { eq, and }) =>

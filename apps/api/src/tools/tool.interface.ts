@@ -23,7 +23,7 @@ export interface AgentTool<TInput = any, TOutput = any> {
   name: string;
   description: string;
   riskLevel: ToolRiskLevel;
-  inputSchema: z.ZodType<TInput>;
+  inputSchema: z.ZodType<TInput, any, any>;
   requiresApproval?: boolean | ((input: TInput, ctx: ToolExecutionContext) => boolean);
   execute(input: TInput, ctx: ToolExecutionContext): Promise<TOutput>;
 }

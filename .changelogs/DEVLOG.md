@@ -307,11 +307,51 @@ Or add permanently via System Properties → Environment Variables.
 - `apps/api/src/agents/qualification/qualification.agent.ts`
 - `apps/api/src/agents/conversation/conversation.agent.ts`
 - `apps/api/src/agents/supervisor.agent.ts`
-- `apps/api/src/modules/agents/agents.service.ts`
-- `apps/api/src/modules/agents/agents.controller.ts`
+---
+
+## 2026-09-24 — Phase 3: Omnichannel Inbound Webhooks, Identity Resolution & Enrichment
+
+### [2026-09-24] — Webhooks Engine, Identity Graph & Firmographic Waterfall Built and Tested
+**Who:** Antigravity AI  
+**Phase:** Phase 3 (Lead Workflow & Inbound Engine)  
+**Type:** Feature | Security | Test
+
+**What happened:**
+1. **Webhook Ingestion & Idempotency Layer (`apps/api/src/modules/webhooks/`):**
+   - Built [`WebhooksController`](file:///c:/PROJECTS/Revora%20%E2%80%94%20Multi-Agent%20GTM%20and%20CRM%20Automation%20Platform/apps/api/src/modules/webhooks/webhooks.controller.ts) supporting `POST /api/v1/webhooks/:provider` (`instagram`, `email`, `whatsapp`, `form`, `website`, `stripe`).
+   - Implemented HMAC SHA-256 signature verification in [`WebhooksService`](file:///c:/PROJECTS/Revora%20%E2%80%94%20Multi-Agent%20GTM%20and%20CRM%20Automation%20Platform/apps/api/src/modules/webhooks/webhooks.service.ts) against secret keys.
+   - Implemented strict idempotency guard: checks `webhook_events` table for existing `${provider}:${providerEventId}` key; if already processed, skips redundant execution and avoids duplicated token/agent billing.
+   - Automatically hands verified events to the multi-agent swarm pipeline.
+
+2. **Company Enrichment Agent (`apps/api/src/agents/enrichment/`):**
+   - Built [`EnrichmentAgent`](file:///c:/PROJECTS/Revora%20%E2%80%94%20Multi-Agent%20GTM%20and%20CRM%20Automation%20Platform/apps/api/src/agents/enrichment/enrichment.agent.ts) to filter out free consumer webmail domains (`gmail.com`, `yahoo.com`, `outlook.com`, etc.) and isolate B2B corporate domains.
+   - Implemented firmographic waterfall heuristics deriving company name, industry vertical (Enterprise Software, FinTech, Healthcare, B2B), headcount size estimate, and location.
+   - Upserts `companies` record in database and links to contact and lead.
+
+3. **Identity Resolution Agent (`apps/api/src/agents/identity-resolution/`):**
+   - Built [`IdentityResolutionAgent`](file:///c:/PROJECTS/Revora%20%E2%80%94%20Multi-Agent%20GTM%20and%20CRM%20Automation%20Platform/apps/api/src/agents/identity-resolution/identity-resolution.agent.ts) to match incoming leads across exact email (100%), exact phone (100%), social ID (100%), or cross-channel fuzzy name/company matches.
+   - Bounded autonomy policy:
+     - `Confidence >= 85%`: Autonomous profile merge into existing contact.
+     - `60% <= Confidence < 85%`: Ambiguous match! Automatically halts and creates an `approval_request` for sales rep / manager verification.
+
+4. **Supervisor Swarm Orchestration Update:**
+   - Extended [`SupervisorAgent`](file:///c:/PROJECTS/Revora%20%E2%80%94%20Multi-Agent%20GTM%20and%20CRM%20Automation%20Platform/apps/api/src/agents/supervisor.agent.ts) with full 5-stage pipeline:
+     `Intake ➡️ Identity Resolution ➡️ Enrichment ➡️ Qualification ➡️ Conversation / Booking`
+
+5. **Automated Test Suite Expansion:**
+   - Added unit tests in [`agent-runtime.spec.ts`](file:///c:/PROJECTS/Revora%20%E2%80%94%20Multi-Agent%20GTM%20and%20CRM%20Automation%20Platform/apps/api/test/agent-runtime.spec.ts) for HMAC signature verification, personal domain filtering, and firmographic waterfall enrichment.
+   - All 9 unit tests passing!
+
+**Files affected:**
+- `apps/api/src/modules/webhooks/dto/webhook-payload.dto.ts`
+- `apps/api/src/modules/webhooks/webhooks.service.ts`
+- `apps/api/src/modules/webhooks/webhooks.controller.ts`
+- `apps/api/src/modules/webhooks/webhooks.module.ts`
+- `apps/api/src/agents/enrichment/enrichment.agent.ts`
+- `apps/api/src/agents/identity-resolution/identity-resolution.agent.ts`
+- `apps/api/src/agents/supervisor.agent.ts`
 - `apps/api/src/modules/agents/agents.module.ts`
 - `apps/api/src/app.module.ts`
-- `apps/api/package.json`
 - `apps/api/test/agent-runtime.spec.ts`
 
 ---

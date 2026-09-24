@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { AgentsController } from './agents.controller';
 import { AgentsService } from './agents.service';
 import { LeadIntakeAgent } from '../../agents/lead-intake/lead-intake.agent';
+import { IdentityResolutionAgent } from '../../agents/identity-resolution/identity-resolution.agent';
+import { EnrichmentAgent } from '../../agents/enrichment/enrichment.agent';
 import { QualificationAgent } from '../../agents/qualification/qualification.agent';
 import { ConversationAgent } from '../../agents/conversation/conversation.agent';
 import { SupervisorAgent } from '../../agents/supervisor.agent';
@@ -13,6 +15,8 @@ import { ToolsModule } from '../../tools/tools.module';
   providers: [
     AgentsService,
     LeadIntakeAgent,
+    IdentityResolutionAgent,
+    EnrichmentAgent,
     QualificationAgent,
     ConversationAgent,
     SupervisorAgent,
@@ -21,6 +25,8 @@ import { ToolsModule } from '../../tools/tools.module';
     AgentsService,
     SupervisorAgent,
     LeadIntakeAgent,
+    IdentityResolutionAgent,
+    EnrichmentAgent,
     QualificationAgent,
     ConversationAgent,
   ],

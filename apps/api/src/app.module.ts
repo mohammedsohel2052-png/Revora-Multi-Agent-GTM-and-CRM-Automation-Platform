@@ -8,6 +8,7 @@ import { HealthModule } from './modules/health/health.module';
 import { TenantsModule } from './modules/tenants/tenants.module';
 import { ToolsModule } from './tools/tools.module';
 import { AgentsModule } from './modules/agents/agents.module';
+import { WebhooksModule } from './modules/webhooks/webhooks.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AgentsModule } from './modules/agents/agents.module';
     TenantsModule,
     ToolsModule,
     AgentsModule,
+    WebhooksModule,
   ],
   providers: [
     {

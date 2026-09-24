@@ -2,7 +2,45 @@ import { ToolRegistryService } from '../src/tools/tool-registry.service';
 import { AuditService } from '../src/modules/audit/audit.service';
 import { QualificationAgent } from '../src/agents/qualification/qualification.agent';
 import { ConversationAgent } from '../src/agents/conversation/conversation.agent';
+import { EnrichmentAgent } from '../src/agents/enrichment/enrichment.agent';
+import { WebhooksService } from '../src/modules/webhooks/webhooks.service';
 import { randomUUID } from 'crypto';
+
+jest.mock('@revora/db', () => ({
+  db: {
+    query: {
+      contacts: {
+        findMany: jest.fn().mockResolvedValue([]),
+        findFirst: jest.fn().mockResolvedValue(null),
+      },
+      companies: {
+        findFirst: jest.fn().mockResolvedValue(null),
+      },
+      tenants: {
+        findFirst: jest.fn().mockResolvedValue({ id: 'mock-tenant-id' }),
+      },
+      webhookEvents: {
+        findFirst: jest.fn().mockResolvedValue(null),
+      },
+    },
+    insert: jest.fn().mockReturnValue({
+      values: jest.fn().mockResolvedValue([{ id: 'mock-id' }]),
+    }),
+    update: jest.fn().mockReturnValue({
+      set: jest.fn().mockReturnValue({
+        where: jest.fn().mockResolvedValue([{ id: 'mock-id' }]),
+      }),
+    }),
+  },
+  contacts: {},
+  companies: {},
+  leads: {},
+  conversations: {},
+  messages: {},
+  approvalRequests: {},
+  webhookEvents: {},
+  usageEvents: {},
+}));
 
 describe('Revora Agent Runtime & Safety Engine', () => {
   let auditService: jest.Mocked<AuditService>;
@@ -184,6 +222,83 @@ describe('Revora Agent Runtime & Safety Engine', () => {
       expect(output.approvalRequired).toBe(true);
       expect(output.approvalId).toBe('app-999');
       expect(output.status).toBe('pending_approval');
+    });
+  });
+
+  describe('EnrichmentAgent (Domain Extraction & Firmographic Waterfall)', () => {
+    let enrichmentAgent: EnrichmentAgent;
+
+    beforeEach(() => {
+      enrichmentAgent = new EnrichmentAgent(toolRegistry);
+    });
+
+    it('should ignore personal webmail domains like gmail.com', async () => {
+      const ctx = {
+        tenantId: randomUUID(),
+        traceId: 'tr_enrich_1',
+      };
+
+      const result = await enrichmentAgent.execute(
+        {
+          contactId: randomUUID(),
+          email: 'user123@gmail.com',
+        },
+        ctx,
+      );
+
+      expect(result.isPersonalEmail).toBe(true);
+      expect(result.domain).toBeUndefined();
+    });
+
+    it('should derive industry and company name from corporate domains', async () => {
+      const ctx = {
+        tenantId: randomUUID(),
+        traceId: 'tr_enrich_2',
+      };
+
+      // Mock database insert/update
+      jest.spyOn<any, any>(enrichmentAgent, 'callTool').mockResolvedValue({ success: true });
+
+      const result = await enrichmentAgent.execute(
+        {
+          contactId: randomUUID(),
+          email: 'alex@cloudscale.ai',
+        },
+        ctx,
+      );
+
+      expect(result.domain).toBe('cloudscale.ai');
+      expect(result.companyName).toBe('Cloudscale');
+      expect(result.industry).toContain('Software');
+      expect(result.isPersonalEmail).toBe(false);
+    });
+  });
+
+  describe('WebhooksService (Signature Verification & Idempotency)', () => {
+    let webhooksService: WebhooksService;
+    let mockSupervisor: any;
+
+    beforeEach(() => {
+      mockSupervisor = {
+        runPipeline: jest.fn().mockResolvedValue({
+          workflowRunId: 'run-123',
+          qualification: { qualification_status: 'qualified' },
+        }),
+      };
+      webhooksService = new WebhooksService(mockSupervisor, auditService);
+    });
+
+    it('should verify valid HMAC SHA-256 signatures correctly', () => {
+      process.env['INSTAGRAM_WEBHOOK_SECRET'] = 'secret_test_key';
+      const body = JSON.stringify({ event: 'test' });
+      const crypto = require('crypto');
+      const signature = crypto.createHmac('sha256', 'secret_test_key').update(body).digest('hex');
+
+      const isValid = webhooksService.verifySignature('instagram', body, `sha256=${signature}`);
+      expect(isValid).toBe(true);
+
+      const isInvalid = webhooksService.verifySignature('instagram', body, 'sha256=wrong_digest');
+      expect(isInvalid).toBe(false);
     });
   });
 });

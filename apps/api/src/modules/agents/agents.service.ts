@@ -6,6 +6,7 @@ import { QualificationAgent, QualificationInput } from '../../agents/qualificati
 import { ConversationAgent, ConversationTurnInput } from '../../agents/conversation/conversation.agent';
 import { BookingAgent, BookingAgentInput } from '../../agents/booking/booking.agent';
 import { HumanHandoffAgent, HumanHandoffInput } from '../../agents/human-handoff/human-handoff.agent';
+import { PaymentAgent, PaymentIntentInput } from '../../agents/payment/payment.agent';
 import { ToolRegistryService } from '../../tools/tool-registry.service';
 import { randomUUID } from 'crypto';
 
@@ -19,6 +20,7 @@ export class AgentsService {
     private readonly conversationAgent: ConversationAgent,
     private readonly bookingAgent: BookingAgent,
     private readonly humanHandoffAgent: HumanHandoffAgent,
+    private readonly paymentAgent: PaymentAgent,
     private readonly toolRegistry: ToolRegistryService,
   ) {}
 
@@ -72,5 +74,17 @@ export class AgentsService {
       conversationId: input.conversationId,
       leadId: input.leadId,
     });
+  }
+
+  async createPaymentSession(tenantId: string, input: PaymentIntentInput) {
+    return await this.paymentAgent.createCheckoutSession(tenantId, input, {
+      tenantId,
+      traceId: `tr_pay_${randomUUID().slice(0, 8)}`,
+      leadId: input.leadId,
+    });
+  }
+
+  async verifyPayment(tenantId: string, query: { contactId: string; stripeSessionId?: string }) {
+    return await this.paymentAgent.checkPaymentVerification(tenantId, query);
   }
 }

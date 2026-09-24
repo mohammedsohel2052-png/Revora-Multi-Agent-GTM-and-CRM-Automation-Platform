@@ -8,6 +8,7 @@ import { QualificationAgent } from '../../agents/qualification/qualification.age
 import { ConversationAgent } from '../../agents/conversation/conversation.agent';
 import { BookingAgent } from '../../agents/booking/booking.agent';
 import { HumanHandoffAgent } from '../../agents/human-handoff/human-handoff.agent';
+import { PaymentAgent } from '../../agents/payment/payment.agent';
 import { SupervisorAgent } from '../../agents/supervisor.agent';
 import { ToolsModule } from '../../tools/tools.module';
 
@@ -23,6 +24,7 @@ import { ToolsModule } from '../../tools/tools.module';
     ConversationAgent,
     BookingAgent,
     HumanHandoffAgent,
+    PaymentAgent,
     SupervisorAgent,
   ],
   exports: [
@@ -35,6 +37,7 @@ import { ToolsModule } from '../../tools/tools.module';
     ConversationAgent,
     BookingAgent,
     HumanHandoffAgent,
+    PaymentAgent,
   ],
 })
 export class AgentsModule {}

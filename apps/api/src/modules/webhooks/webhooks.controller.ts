@@ -9,6 +9,7 @@ import {
   SetMetadata,
 } from '@nestjs/common';
 import { WebhooksService } from './webhooks.service';
+import { StripeWebhookService } from './stripe-webhook.service';
 import { InboundWebhookDto } from './dto/webhook-payload.dto';
 import { CurrentTenant } from '../../common/decorators/tenant.decorator';
 import { TenantGuard } from '../../common/guards/tenant.guard';
@@ -20,12 +21,26 @@ export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
 @ApiTags('webhooks')
 @Controller('webhooks')
 export class WebhooksController {
-  constructor(private readonly webhooksService: WebhooksService) {}
+  constructor(
+    private readonly webhooksService: WebhooksService,
+    private readonly stripeWebhookService: StripeWebhookService,
+  ) {}
+
+  @Public()
+  @Post('stripe')
+  @ApiOperation({ summary: 'Authoritative Stripe payment confirmation webhook endpoint' })
+  async handleStripeWebhook(
+    @Body() rawPayload: Record<string, unknown>,
+    @Headers('stripe-signature') signature?: string,
+  ) {
+    const rawBody = JSON.stringify(rawPayload);
+    return await this.stripeWebhookService.handleStripeEvent(rawBody, signature);
+  }
 
   @Public()
   @Post(':provider')
   @ApiOperation({ summary: 'Ingest raw inbound webhook with HMAC verification and idempotency' })
-  @ApiParam({ name: 'provider', enum: ['instagram', 'email', 'whatsapp', 'form', 'website', 'stripe'] })
+  @ApiParam({ name: 'provider', enum: ['instagram', 'email', 'whatsapp', 'form', 'website'] })
   async handleWebhook(
     @Param('provider') provider: 'instagram' | 'email' | 'whatsapp' | 'form' | 'website',
     @Body() dto: InboundWebhookDto,

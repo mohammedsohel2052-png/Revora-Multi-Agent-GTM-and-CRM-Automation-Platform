@@ -406,4 +406,72 @@ Or add permanently via System Properties → Environment Variables.
 
 ---
 
+### [2026-09-24] — Phase 5 & 6 Implementation: HITL Approvals, Policy Guardrails, Stripe Billing & LLM Evaluation Engine
+**Who:** Antigravity AI  
+**Phase:** Phase 5 & Phase 6  
+**Type:** Feature | Security | AI Runtime | Test
+
+**What happened:**
+1. **Policy Engine (`apps/api/src/modules/policy/`):**
+   - Implemented `PolicyEngineService` enforcing pre-action compliance checks:
+     - **PII / Secret Leakage Prevention:** Intercepts credit card numbers, US SSNs, API keys, and bearer tokens with regex patterns (`BLOCK`, risk: `critical`).
+     - **Pricing & Discount Threshold:** Autonomous agents cannot offer >15% discounts or >$10k contracts without manager sign-off (`REQUIRE_APPROVAL`, risk: `high`).
+     - **Bounded Autonomy:** Gated by `ENABLE_AUTONOMOUS_SENDING=false`. Holds outbound messaging for review.
+   - Implemented `PolicyController` (`GET /api/v1/policy/rules`, `POST /api/v1/policy/evaluate`).
+
+2. **Human-in-the-Loop Approvals (`apps/api/src/modules/approvals/`):**
+   - Implemented `ApprovalsService` & `ApprovalsController`:
+     - `GET /api/v1/approvals/pending`
+     - `POST /api/v1/approvals/:id/approve` — Marks approved, triggers immediate dispatch/execution, records audit event.
+     - `POST /api/v1/approvals/:id/reject` — Records rejection reason, marks blocked, records audit event.
+     - `POST /api/v1/approvals/:id/edit-and-approve` — Allows human operators to edit drafted copy or pricing before releasing.
+
+3. **Payment Agent & Authoritative Stripe Billing (`apps/api/src/agents/payment/`):**
+   - Implemented `PaymentAgent` creating Stripe checkout sessions.
+   - **Critical Security Invariant Enforced:** Chat claims from prospects ("I paid!") are refused until the official Stripe webhook arrives.
+   - Implemented `StripeWebhookService` handling HMAC signature verification, idempotent recording in `webhook_events`, updating `payments.verifiedViaWebhook = true`, transitioning attached `opportunities.stage = 'won'`, and writing immutable audit trail.
+
+4. **Knowledge Base & pgvector Semantic RAG (`apps/api/src/modules/knowledge/`):**
+   - Implemented `KnowledgeService` with sliding window text chunking and 1536-dimensional normalized vector embeddings.
+   - Registered `search_knowledge_base` tool in `ToolRegistryService` allowing agents to ground answers on uploaded FAQs, pricing guides, and battlecards.
+
+5. **LLM-as-a-Judge Evaluation Engine (`apps/api/src/modules/evaluation/`):**
+   - Implemented `EvaluationService` scoring responses across 4 axes:
+     - Hallucination groundedness (0-100)
+     - Tone & brand empathy (0-100)
+     - Policy compliance (0-100)
+     - ICP qualification accuracy (0-100)
+   - Evaluates prompt versions side-by-side with release recommendations (`PASS`, `WARNING`, `BLOCK`).
+
+6. **Test Suite & Verification:**
+   - 25 automated tests in `apps/api/test/agent-runtime.spec.ts` passing 100%.
+   - `nest build` passed with 0 errors.
+   - `next build` passed with 0 errors (all 10 web routes prerendered).
+
+**Files affected:**
+- `apps/api/src/modules/policy/policy-engine.service.ts`
+- `apps/api/src/modules/policy/policy.controller.ts`
+- `apps/api/src/modules/policy/policy.module.ts`
+- `apps/api/src/modules/approvals/approvals.service.ts`
+- `apps/api/src/modules/approvals/approvals.controller.ts`
+- `apps/api/src/modules/approvals/approvals.module.ts`
+- `apps/api/src/agents/payment/payment.agent.ts`
+- `apps/api/src/modules/webhooks/stripe-webhook.service.ts`
+- `apps/api/src/modules/webhooks/webhooks.controller.ts`
+- `apps/api/src/modules/webhooks/webhooks.module.ts`
+- `apps/api/src/modules/knowledge/knowledge.service.ts`
+- `apps/api/src/modules/knowledge/knowledge.controller.ts`
+- `apps/api/src/modules/knowledge/knowledge.module.ts`
+- `apps/api/src/tools/definitions/search-knowledge-base.tool.ts`
+- `apps/api/src/tools/definitions/create-checkout-session.tool.ts`
+- `apps/api/src/tools/tool-registry.service.ts`
+- `apps/api/src/modules/evaluation/evaluation.service.ts`
+- `apps/api/src/modules/evaluation/evaluation.controller.ts`
+- `apps/api/src/modules/evaluation/evaluation.module.ts`
+- `apps/api/src/app.module.ts`
+- `apps/api/test/agent-runtime.spec.ts`
+
+---
+
 *DEVLOG started: 2026-09-24 | Project: Revora GTM Intelligence OS | Maintained by: Mohammed Sohel*
+

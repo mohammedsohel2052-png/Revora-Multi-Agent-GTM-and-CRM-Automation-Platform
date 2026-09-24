@@ -52,4 +52,17 @@ export class AgentsController {
   async evaluateHandoff(@CurrentTenant() tenantId: string, @Body() body: any) {
     return await this.agentsService.evaluateHumanHandoff(tenantId, body);
   }
+
+  @Post('payments/checkout')
+  @ApiOperation({ summary: 'Create Stripe checkout session for qualified prospect' })
+  async createCheckout(@CurrentTenant() tenantId: string, @Body() body: any) {
+    return await this.agentsService.createPaymentSession(tenantId, body);
+  }
+
+  @Post('payments/verify')
+  @ApiOperation({ summary: 'Verify if payment has been authoritatively confirmed via Stripe webhook' })
+  async verifyPayment(@CurrentTenant() tenantId: string, @Body() body: any) {
+    return await this.agentsService.verifyPayment(tenantId, body);
+  }
 }
+

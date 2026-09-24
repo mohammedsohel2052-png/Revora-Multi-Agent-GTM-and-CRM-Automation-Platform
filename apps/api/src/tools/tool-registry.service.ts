@@ -8,6 +8,8 @@ import { draftOutboundMessageTool } from './definitions/draft-outbound-message.t
 import { checkCalendarTool } from './definitions/check-calendar.tool';
 import { bookCalendarMeetingTool } from './definitions/book-calendar-meeting.tool';
 import { triggerHumanHandoffTool } from './definitions/trigger-human-handoff.tool';
+import { searchKnowledgeBaseTool } from './definitions/search-knowledge-base.tool';
+import { createCheckoutSessionTool } from './definitions/create-checkout-session.tool';
 
 @Injectable()
 export class ToolRegistryService {
@@ -22,6 +24,8 @@ export class ToolRegistryService {
     this.registerTool(checkCalendarTool);
     this.registerTool(bookCalendarMeetingTool);
     this.registerTool(triggerHumanHandoffTool);
+    this.registerTool(searchKnowledgeBaseTool);
+    this.registerTool(createCheckoutSessionTool);
   }
 
   registerTool(tool: AgentTool) {

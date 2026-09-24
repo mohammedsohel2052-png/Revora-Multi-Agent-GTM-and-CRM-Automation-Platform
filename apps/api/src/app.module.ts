@@ -10,6 +10,10 @@ import { ToolsModule } from './tools/tools.module';
 import { AgentsModule } from './modules/agents/agents.module';
 import { WebhooksModule } from './modules/webhooks/webhooks.module';
 import { WorkflowsModule } from './modules/workflows/workflows.module';
+import { PolicyModule } from './modules/policy/policy.module';
+import { ApprovalsModule } from './modules/approvals/approvals.module';
+import { KnowledgeModule } from './modules/knowledge/knowledge.module';
+import { EvaluationModule } from './modules/evaluation/evaluation.module';
 
 @Module({
   imports: [
@@ -24,6 +28,10 @@ import { WorkflowsModule } from './modules/workflows/workflows.module';
     AgentsModule,
     WebhooksModule,
     WorkflowsModule,
+    PolicyModule,
+    ApprovalsModule,
+    KnowledgeModule,
+    EvaluationModule,
   ],
   providers: [
     {
